@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
+
 #include "etimer.h"
+#include "etimer16.h"
 
 //
 // Tests
@@ -49,53 +51,53 @@ void test_etimer_past(void)
     SUITE_START("test_etimer_past");
 
     // check code.
-    uint32_t time0 = 20;
-    uint32_t time1 = 10;
-    uint8_t past = etimer_past(time0, time1);
-    uint8_t expect_past = 0;
+    uint32_t time1 = 20;
+    uint32_t time2 = 10;
+    int past = etimer_past(time1, time2);
+    int expect_past = 0;
     ASSERT(past == expect_past);
 
-    time0 = 10;
-    time1 = 20;
-    past = etimer_past(time0, time1);
-    expect_past = 1;
-    ASSERT(past == expect_past);
-
-    time0 = 0xfffffff0;
     time1 = 10;
-    past = etimer_past(time0, time1);
+    time2 = 20;
+    past = etimer_past(time1, time2);
     expect_past = 1;
     ASSERT(past == expect_past);
 
-    time0 = 10;
     time1 = 0xfffffff0;
-    past = etimer_past(time0, time1);
-    expect_past = 0;
+    time2 = 10;
+    past = etimer_past(time1, time2);
+    expect_past = 1;
     ASSERT(past == expect_past);
 
-    time0 = 10 + ETIMER32_MAX_VALUE_OVERFLOW - 1;
     time1 = 10;
-    past = etimer_past(time0, time1);
+    time2 = 0xfffffff0;
+    past = etimer_past(time1, time2);
     expect_past = 0;
     ASSERT(past == expect_past);
 
-    time0 = 10;
-    time1 = 10 + ETIMER32_MAX_VALUE_OVERFLOW - 1;
-    past = etimer_past(time0, time1);
+    time1 = 10 + ETIMER_MAX_VALUE_OVERFLOW - 1;
+    time2 = 10;
+    past = etimer_past(time1, time2);
+    expect_past = 0;
+    ASSERT(past == expect_past);
+
+    time1 = 10;
+    time2 = 10 + ETIMER_MAX_VALUE_OVERFLOW - 1;
+    past = etimer_past(time1, time2);
     expect_past = 1;
     ASSERT(past == expect_past);
 
     // Becareful here, uint32_t to int32_t will overflow, should work with _time_past
-    time0 = 10 + ETIMER32_MAX_VALUE_OVERFLOW + 1;
-    time1 = 10;
-    past = etimer_past(time0, time1);
+    time1 = 10 + ETIMER_MAX_VALUE_OVERFLOW + 1;
+    time2 = 10;
+    past = etimer_past(time1, time2);
     expect_past = 1;
     ASSERT(past == expect_past);
 
     // Becareful here, uint32_t to int32_t will overflow, should work with _time_past
-    time0 = 10;
-    time1 = 10 + ETIMER32_MAX_VALUE_OVERFLOW + 1;
-    past = etimer_past(time0, time1);
+    time1 = 10;
+    time2 = 10 + ETIMER_MAX_VALUE_OVERFLOW + 1;
+    past = etimer_past(time1, time2);
     expect_past = 0;
     ASSERT(past == expect_past);
 
@@ -107,54 +109,170 @@ void test_etimer_sub(void)
     SUITE_START("test_etimer_sub");
 
     // check code.
-    uint32_t time0 = 20;
-    uint32_t time1 = 10;
-    int32_t diff = etimer_sub(time0, time1);
+    uint32_t time1 = 20;
+    uint32_t time2 = 10;
+    int32_t diff = etimer_sub(time1, time2);
     int32_t expect_diff = 10;
     ASSERT(diff == expect_diff);
 
-    time0 = 10;
-    time1 = 20;
-    diff = etimer_sub(time0, time1);
+    time1 = 10;
+    time2 = 20;
+    diff = etimer_sub(time1, time2);
     expect_diff = -10;
     ASSERT(diff == expect_diff);
 
-    time0 = 0xfffffff0;
-    time1 = 10;
-    diff = etimer_sub(time0, time1);
+    time1 = 0xfffffff0;
+    time2 = 10;
+    diff = etimer_sub(time1, time2);
     expect_diff = -26;
     ASSERT(diff == expect_diff);
 
-    time0 = 10;
-    time1 = 0xfffffff0;
-    diff = etimer_sub(time0, time1);
+    time1 = 10;
+    time2 = 0xfffffff0;
+    diff = etimer_sub(time1, time2);
     expect_diff = 26;
     ASSERT(diff == expect_diff);
 
-    time0 = 10 + ETIMER32_MAX_VALUE_OVERFLOW - 1;
-    time1 = 10;
-    diff = etimer_sub(time0, time1);
-    expect_diff = ETIMER32_MAX_VALUE_OVERFLOW - 1;
+    time1 = 10 + ETIMER_MAX_VALUE_OVERFLOW - 1;
+    time2 = 10;
+    diff = etimer_sub(time1, time2);
+    expect_diff = ETIMER_MAX_VALUE_OVERFLOW - 1;
     ASSERT(diff == expect_diff);
 
-    time0 = 10;
-    time1 = 10 + ETIMER32_MAX_VALUE_OVERFLOW - 1;
-    diff = etimer_sub(time0, time1);
-    expect_diff = -(ETIMER32_MAX_VALUE_OVERFLOW - 1);
+    time1 = 10;
+    time2 = 10 + ETIMER_MAX_VALUE_OVERFLOW - 1;
+    diff = etimer_sub(time1, time2);
+    expect_diff = -(ETIMER_MAX_VALUE_OVERFLOW - 1);
     ASSERT(diff == expect_diff);
 
     // Becareful here, uint32_t to int32_t will overflow, should work with _time_past
-    time0 = 10 + ETIMER32_MAX_VALUE_OVERFLOW + 1;
-    time1 = 10;
-    diff = etimer_sub(time0, time1);
-    expect_diff = -(ETIMER32_MAX_VALUE + 1 - (ETIMER32_MAX_VALUE_OVERFLOW + 1));
+    time1 = 10 + ETIMER_MAX_VALUE_OVERFLOW + 1;
+    time2 = 10;
+    diff = etimer_sub(time1, time2);
+    expect_diff = -(ETIMER_MAX_VALUE + 1 - (ETIMER_MAX_VALUE_OVERFLOW + 1));
     ASSERT(diff == expect_diff);
 
     // Becareful here, uint32_t to int32_t will overflow, should work with _time_past
-    time0 = 10;
-    time1 = 10 + ETIMER32_MAX_VALUE_OVERFLOW + 1;
-    diff = etimer_sub(time0, time1);
-    expect_diff = (ETIMER32_MAX_VALUE + 1 - (ETIMER32_MAX_VALUE_OVERFLOW + 1));
+    time1 = 10;
+    time2 = 10 + ETIMER_MAX_VALUE_OVERFLOW + 1;
+    diff = etimer_sub(time1, time2);
+    expect_diff = (ETIMER_MAX_VALUE + 1 - (ETIMER_MAX_VALUE_OVERFLOW + 1));
+    ASSERT(diff == expect_diff);
+
+    SUITE_END();
+}
+
+void test_etimer16_past(void)
+{
+    SUITE_START("test_etimer16_past");
+
+    // check code.
+    uint16_t time1 = 20;
+    uint16_t time2 = 10;
+    int past = etimer16_past(time1, time2);
+    int expect_past = 0;
+    ASSERT(past == expect_past);
+
+    time1 = 10;
+    time2 = 20;
+    past = etimer16_past(time1, time2);
+    expect_past = 1;
+    ASSERT(past == expect_past);
+
+    time1 = 0xfff0;
+    time2 = 10;
+    past = etimer16_past(time1, time2);
+    expect_past = 1;
+    ASSERT(past == expect_past);
+
+    time1 = 10;
+    time2 = 0xfff0;
+    past = etimer16_past(time1, time2);
+    expect_past = 0;
+    ASSERT(past == expect_past);
+
+    time1 = 10 + ETIMER16_MAX_VALUE_OVERFLOW - 1;
+    time2 = 10;
+    past = etimer16_past(time1, time2);
+    expect_past = 0;
+    ASSERT(past == expect_past);
+
+    time1 = 10;
+    time2 = 10 + ETIMER16_MAX_VALUE_OVERFLOW - 1;
+    past = etimer16_past(time1, time2);
+    expect_past = 1;
+    ASSERT(past == expect_past);
+
+    // Becareful here, uint16_t to int16_t will overflow, should work with _time_past
+    time1 = 10 + ETIMER16_MAX_VALUE_OVERFLOW + 1;
+    time2 = 10;
+    past = etimer16_past(time1, time2);
+    expect_past = 1;
+    ASSERT(past == expect_past);
+
+    // Becareful here, uint16_t to int16_t will overflow, should work with _time_past
+    time1 = 10;
+    time2 = 10 + ETIMER16_MAX_VALUE_OVERFLOW + 1;
+    past = etimer16_past(time1, time2);
+    expect_past = 0;
+    ASSERT(past == expect_past);
+
+    SUITE_END();
+}
+
+void test_etimer16_sub(void)
+{
+    SUITE_START("test_etimer16_sub");
+
+    // check code.
+    uint16_t time1 = 20;
+    uint16_t time2 = 10;
+    int16_t diff = etimer16_sub(time1, time2);
+    int16_t expect_diff = 10;
+    ASSERT(diff == expect_diff);
+
+    time1 = 10;
+    time2 = 20;
+    diff = etimer16_sub(time1, time2);
+    expect_diff = -10;
+    ASSERT(diff == expect_diff);
+
+    time1 = 0xfff0;
+    time2 = 10;
+    diff = etimer16_sub(time1, time2);
+    expect_diff = -26;
+    ASSERT(diff == expect_diff);
+
+    time1 = 10;
+    time2 = 0xfff0;
+    diff = etimer16_sub(time1, time2);
+    expect_diff = 26;
+    ASSERT(diff == expect_diff);
+
+    time1 = 10 + ETIMER16_MAX_VALUE_OVERFLOW - 1;
+    time2 = 10;
+    diff = etimer16_sub(time1, time2);
+    expect_diff = ETIMER16_MAX_VALUE_OVERFLOW - 1;
+    ASSERT(diff == expect_diff);
+
+    time1 = 10;
+    time2 = 10 + ETIMER16_MAX_VALUE_OVERFLOW - 1;
+    diff = etimer16_sub(time1, time2);
+    expect_diff = -(ETIMER16_MAX_VALUE_OVERFLOW - 1);
+    ASSERT(diff == expect_diff);
+
+    // Becareful here, uint16_t to int16_t will overflow, should work with _time_past
+    time1 = 10 + ETIMER16_MAX_VALUE_OVERFLOW + 1;
+    time2 = 10;
+    diff = etimer16_sub(time1, time2);
+    expect_diff = -(ETIMER16_MAX_VALUE + 1 - (ETIMER16_MAX_VALUE_OVERFLOW + 1));
+    ASSERT(diff == expect_diff);
+
+    // Becareful here, uint16_t to int16_t will overflow, should work with _time_past
+    time1 = 10;
+    time2 = 10 + ETIMER16_MAX_VALUE_OVERFLOW + 1;
+    diff = etimer16_sub(time1, time2);
+    expect_diff = (ETIMER16_MAX_VALUE + 1 - (ETIMER16_MAX_VALUE_OVERFLOW + 1));
     ASSERT(diff == expect_diff);
 
     SUITE_END();
@@ -348,6 +466,10 @@ int main(void)
     // special sense process test - etimer
     test_etimer_past();
     test_etimer_sub();
+
+    // special sense process test - etimer16
+    test_etimer16_past();
+    test_etimer16_sub();
 
     return 0;
 }

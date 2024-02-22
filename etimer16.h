@@ -1,5 +1,5 @@
-#ifndef _ETIMER_H_
-#define _ETIMER_H_
+#ifndef _ETIMER16_H_
+#define _ETIMER16_H_
 
 #include <stdint.h>
 #include <string.h>
@@ -8,8 +8,8 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#define ETIMER_MAX_VALUE          (~(uint32_t)0)
-#define ETIMER_MAX_VALUE_OVERFLOW ((uint32_t)(ETIMER_MAX_VALUE) >> 1)
+#define ETIMER16_MAX_VALUE          (~(uint16_t)0)
+#define ETIMER16_MAX_VALUE_OVERFLOW ((uint16_t)(ETIMER16_MAX_VALUE) >> 1)
 
 /**
  * @brief  Check two absolute times past with maxvalue/overflow check: time1<time2.
@@ -18,7 +18,7 @@ extern "C" {
  * @param[in]  overflow: Overflow time value.
  * @return resulting 1 means past(time1<time2).
  */
-static inline int etimer_past_raw(uint32_t time1, uint32_t time2, uint32_t overflow)
+static inline int etimer16_past_raw(uint16_t time1, uint16_t time2, uint16_t overflow)
 {
     if (time1 <= time2)
     {
@@ -34,9 +34,9 @@ static inline int etimer_past_raw(uint32_t time1, uint32_t time2, uint32_t overf
  * @param[in]  time2: Absolute time expressed in internal time units.
  * @return resulting 1 means past(time1<time2).
  */
-static inline int etimer_past(uint32_t time1, uint32_t time2)
+static inline int etimer16_past(uint16_t time1, uint16_t time2)
 {
-    return etimer_past_raw(time1, time2, ETIMER_MAX_VALUE_OVERFLOW);
+    return etimer16_past_raw(time1, time2, ETIMER16_MAX_VALUE_OVERFLOW);
 }
 
 /**
@@ -47,9 +47,9 @@ static inline int etimer_past(uint32_t time1, uint32_t time2)
  * @param[in]  max_value: Max time value.
  * @return 32bit resulting absolute time expressed in internal time units.
  */
-static inline uint32_t etimer_add_raw(uint32_t time1, int32_t ticks, uint32_t max_value)
+static inline uint16_t etimer16_add_raw(uint16_t time1, int16_t ticks, uint16_t max_value)
 {
-    uint32_t tmp = time1 + ticks;
+    uint16_t tmp = time1 + ticks;
     while (tmp > max_value)
     {
         tmp -= max_value + 1;
@@ -64,7 +64,7 @@ static inline uint32_t etimer_add_raw(uint32_t time1, int32_t ticks, uint32_t ma
  * @param[in]  ticks: Signed relative time expressed in internal time units.
  * @return 32bit resulting absolute time expressed in internal time units.
  */
-static inline uint32_t etimer_add(uint32_t time1, int32_t ticks)
+static inline uint16_t etimer16_add(uint16_t time1, int16_t ticks)
 {
     return time1 + ticks;
 }
@@ -78,10 +78,10 @@ static inline uint32_t etimer_add(uint32_t time1, int32_t ticks)
  * @param[in]  max_value: Max time value.
  * @return resulting signed relative time expressed in internal time units.
  */
-static inline int32_t etimer_sub_raw(uint32_t time1, uint32_t time2, uint32_t overflow,
-                                     uint32_t max_value)
+static inline int16_t etimer16_sub_raw(uint16_t time1, uint16_t time2, uint16_t overflow,
+                                       uint16_t max_value)
 {
-    uint32_t diff;
+    uint16_t diff;
     if (time1 >= time2)
     {
         diff = time1 - time2;
@@ -106,7 +106,7 @@ static inline int32_t etimer_sub_raw(uint32_t time1, uint32_t time2, uint32_t ov
  * @param[in]  time2: Absolute time expressed in internal time units.
  * @return resulting signed relative time expressed in internal time units.
  */
-static inline int32_t etimer_sub(uint32_t time1, uint32_t time2)
+static inline int16_t etimer16_sub(uint16_t time1, uint16_t time2)
 {
     return time1 - time2;
 }
@@ -115,4 +115,4 @@ static inline int32_t etimer_sub(uint32_t time1, uint32_t time2)
 }
 #endif /* __cplusplus */
 
-#endif /* _ETIMER_H_ */
+#endif /* _ETIMER16_H_ */
