@@ -163,6 +163,7 @@ void test_work_insuff(void)
 代码结构如下所示：
 
 - **etimer.h**：EasyTimer管理API，都是inline实现，可以根据需要转成c实现。
+- **etimer16.h**：EasyTimer管理16bit处理API，都是inline实现，可以根据需要转成c实现。
 - **main.c**：测试例程。
 - **build.mk**和**Makefile**：Makefile编译环境。
 - **README.md**：说明文档
@@ -170,6 +171,7 @@ void test_work_insuff(void)
 ```shell
 easy_timer
  ├── etimer.h
+ ├── etimer16.h
  ├── build.mk
  ├── main.c
  ├── Makefile
