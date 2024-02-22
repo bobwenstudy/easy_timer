@@ -345,22 +345,28 @@ copy from `output/main.exe' [pei-i386] to `output/main.bin' [binary]
 objdump --source --all-headers --demangle --line-numbers --wide output/main.exe > output/main.lst
 Print Size
    text    data     bss     dec     hex filename
-  49704    2888    2644   55236    d7c4 output/main.exe
+  57888    2888    2644   63420    f7bc output/main.exe
 ./output/main.exe
-failed assert [main.c:415] res == 1
+failed assert [main.c:810] res == 1
 Testing test_work .......................................................... fail
-failed assert [main.c:450] res == 1
-failed assert [main.c:456] tmp == 0x10
-failed assert [main.c:464] diff == 0x20
+failed assert [main.c:845] res == 1
+failed assert [main.c:851] tmp == 0x10
+failed assert [main.c:859] diff == 0x20
 Testing test_work_insuff ................................................... fail
 Testing test_work_etimer ................................................... pass
 Testing test_work_etimer_insuff ............................................ pass
 Testing test_etimer_past ................................................... pass
 Testing test_etimer_sub .................................................... pass
 Testing test_etimer_add .................................................... pass
+Testing test_etimer_raw_past ............................................... pass
+Testing test_etimer_raw_sub ................................................ pass
+Testing test_etimer_raw_add ................................................ pass
 Testing test_etimer16_past ................................................. pass
 Testing test_etimer16_sub .................................................. pass
 Testing test_etimer16_add .................................................. pass
+Testing test_etimer16_raw_past ............................................. pass
+Testing test_etimer16_raw_sub .............................................. pass
+Testing test_etimer16_raw_add .............................................. pass
 Executing 'run: all' complete!
 ```
 

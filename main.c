@@ -206,6 +206,211 @@ void test_etimer_add(void)
     SUITE_END();
 }
 
+
+
+
+void test_etimer_raw_past(void)
+{
+    SUITE_START("test_etimer_raw_past");
+
+    uint32_t max_value = 0x00FFFFFF;
+    uint32_t overflow = max_value / 2;
+
+    // check code.
+    uint32_t time1 = 20;
+    uint32_t time2 = 10;
+    int past = etimer_past_raw(time1, time2, overflow);
+    int expect_past = 0;
+    ASSERT(past == expect_past);
+
+    time1 = 10;
+    time2 = 20;
+    past = etimer_past_raw(time1, time2, overflow);
+    expect_past = 1;
+    ASSERT(past == expect_past);
+
+    time1 = 0x00fffff0;
+    time2 = 10;
+    past = etimer_past_raw(time1, time2, overflow);
+    expect_past = 1;
+    ASSERT(past == expect_past);
+
+    time1 = 10;
+    time2 = 0x00fffff0;
+    past = etimer_past_raw(time1, time2, overflow);
+    expect_past = 0;
+    ASSERT(past == expect_past);
+
+    time1 = 10 + overflow - 1;
+    time2 = 10;
+    past = etimer_past_raw(time1, time2, overflow);
+    expect_past = 0;
+    ASSERT(past == expect_past);
+
+    time1 = 10;
+    time2 = 10 + overflow - 1;
+    past = etimer_past_raw(time1, time2, overflow);
+    expect_past = 1;
+    ASSERT(past == expect_past);
+
+    // Becareful here, uint32_t to int32_t will overflow, should work with _time_past
+    time1 = 10 + overflow + 1;
+    time2 = 10;
+    past = etimer_past_raw(time1, time2, overflow);
+    expect_past = 1;
+    ASSERT(past == expect_past);
+
+    // Becareful here, uint32_t to int32_t will overflow, should work with _time_past
+    time1 = 10;
+    time2 = 10 + overflow + 1;
+    past = etimer_past_raw(time1, time2, overflow);
+    expect_past = 0;
+    ASSERT(past == expect_past);
+
+    SUITE_END();
+}
+
+void test_etimer_raw_sub(void)
+{
+    SUITE_START("test_etimer_raw_sub");
+
+    uint32_t max_value = 0x00FFFFFF;
+    uint32_t overflow = max_value / 2;
+
+    // check code.
+    uint32_t time1 = 20;
+    uint32_t time2 = 10;
+    int32_t diff = etimer_sub_raw(time1, time2, overflow, max_value);
+    int32_t expect_diff = 10;
+    ASSERT(diff == expect_diff);
+
+    time1 = 10;
+    time2 = 20;
+    diff = etimer_sub_raw(time1, time2, overflow, max_value);
+    expect_diff = -10;
+    ASSERT(diff == expect_diff);
+
+    time1 = 0x00fffff0;
+    time2 = 10;
+    diff = etimer_sub_raw(time1, time2, overflow, max_value);
+    expect_diff = -26;
+    ASSERT(diff == expect_diff);
+
+    time1 = 10;
+    time2 = 0x00fffff0;
+    diff = etimer_sub_raw(time1, time2, overflow, max_value);
+    expect_diff = 26;
+    ASSERT(diff == expect_diff);
+
+    time1 = 10 + overflow - 1;
+    time2 = 10;
+    diff = etimer_sub_raw(time1, time2, overflow, max_value);
+    expect_diff = overflow - 1;
+    ASSERT(diff == expect_diff);
+
+    time1 = 10;
+    time2 = 10 + overflow - 1;
+    diff = etimer_sub_raw(time1, time2, overflow, max_value);
+    expect_diff = -(overflow - 1);
+    ASSERT(diff == expect_diff);
+
+    // Becareful here, uint32_t to int32_t will overflow, should work with _time_past
+    time1 = 10 + overflow + 1;
+    time2 = 10;
+    diff = etimer_sub_raw(time1, time2, overflow, max_value);
+    expect_diff = -(max_value + 1 - (overflow + 1));
+    ASSERT(diff == expect_diff);
+
+    // Becareful here, uint32_t to int32_t will overflow, should work with _time_past
+    time1 = 10;
+    time2 = 10 + overflow + 1;
+    diff = etimer_sub_raw(time1, time2, overflow, max_value);
+    expect_diff = (max_value + 1 - (overflow + 1));
+    ASSERT(diff == expect_diff);
+
+    SUITE_END();
+}
+
+void test_etimer_raw_add(void)
+{
+    SUITE_START("test_etimer_raw_add");
+
+    uint32_t max_value = 0x00FFFFFF;
+    uint32_t overflow = max_value / 2;
+
+    // check code.
+    uint32_t time1 = 20;
+    int32_t ticks = 10;
+    uint32_t tmp = etimer_add_raw(time1, ticks, max_value);
+    uint32_t expect_tmp = 30;
+    ASSERT(tmp == expect_tmp);
+
+    time1 = 20;
+    ticks = -10;
+    tmp = etimer_add_raw(time1, ticks, max_value);
+    expect_tmp = 10;
+    ASSERT(tmp == expect_tmp);
+
+    time1 = 0x00fffff0;
+    ticks = 0x20;
+    tmp = etimer_add_raw(time1, ticks, max_value);
+    expect_tmp = 0x10;
+    ASSERT(tmp == expect_tmp);
+
+    time1 = 0x00fffff0;
+    ticks = -0x20;
+    tmp = etimer_add_raw(time1, ticks, max_value);
+    expect_tmp = 0x00ffffd0;
+    ASSERT(tmp == expect_tmp);
+
+    time1 = 0x10;
+    ticks = -0x20;
+    tmp = etimer_add_raw(time1, ticks, max_value);
+    expect_tmp = 0x00fffff0;
+    ASSERT(tmp == expect_tmp);
+
+    time1 = 0x00fffff0;
+    ticks = 0x00ffff10;
+    tmp = etimer_add_raw(time1, ticks, max_value);
+    expect_tmp = 0x00ffff00;
+    ASSERT(tmp == expect_tmp);
+
+    SUITE_END();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 void test_etimer16_past(void)
 {
     SUITE_START("test_etimer16_past");
@@ -365,6 +570,196 @@ void test_etimer16_add(void)
 
     SUITE_END();
 }
+
+
+
+
+
+
+
+void test_etimer16_raw_past(void)
+{
+    SUITE_START("test_etimer16_raw_past");
+
+    uint16_t max_value = 0x0FFF;
+    uint16_t overflow = max_value / 2;
+
+    // check code.
+    uint16_t time1 = 20;
+    uint16_t time2 = 10;
+    int past = etimer16_past_raw(time1, time2, overflow);
+    int expect_past = 0;
+    ASSERT(past == expect_past);
+
+    time1 = 10;
+    time2 = 20;
+    past = etimer16_past_raw(time1, time2, overflow);
+    expect_past = 1;
+    ASSERT(past == expect_past);
+
+    time1 = 0x0ff0;
+    time2 = 10;
+    past = etimer16_past_raw(time1, time2, overflow);
+    expect_past = 1;
+    ASSERT(past == expect_past);
+
+    time1 = 10;
+    time2 = 0x0ff0;
+    past = etimer16_past_raw(time1, time2, overflow);
+    expect_past = 0;
+    ASSERT(past == expect_past);
+
+    time1 = 10 + overflow - 1;
+    time2 = 10;
+    past = etimer16_past_raw(time1, time2, overflow);
+    expect_past = 0;
+    ASSERT(past == expect_past);
+
+    time1 = 10;
+    time2 = 10 + overflow - 1;
+    past = etimer16_past_raw(time1, time2, overflow);
+    expect_past = 1;
+    ASSERT(past == expect_past);
+
+    // Becareful here, uint16_t to int16_t will overflow, should work with _time_past
+    time1 = 10 + overflow + 1;
+    time2 = 10;
+    past = etimer16_past_raw(time1, time2, overflow);
+    expect_past = 1;
+    ASSERT(past == expect_past);
+
+    // Becareful here, uint16_t to int16_t will overflow, should work with _time_past
+    time1 = 10;
+    time2 = 10 + overflow + 1;
+    past = etimer16_past_raw(time1, time2, overflow);
+    expect_past = 0;
+    ASSERT(past == expect_past);
+
+    SUITE_END();
+}
+
+void test_etimer16_raw_sub(void)
+{
+    SUITE_START("test_etimer16_raw_sub");
+
+    uint16_t max_value = 0x0FFF;
+    uint16_t overflow = max_value / 2;
+
+    // check code.
+    uint16_t time1 = 20;
+    uint16_t time2 = 10;
+    int16_t diff = etimer16_sub_raw(time1, time2, overflow, max_value);
+    int16_t expect_diff = 10;
+    ASSERT(diff == expect_diff);
+
+    time1 = 10;
+    time2 = 20;
+    diff = etimer16_sub_raw(time1, time2, overflow, max_value);
+    expect_diff = -10;
+    ASSERT(diff == expect_diff);
+
+    time1 = 0x0ff0;
+    time2 = 10;
+    diff = etimer16_sub_raw(time1, time2, overflow, max_value);
+    expect_diff = -26;
+    ASSERT(diff == expect_diff);
+
+    time1 = 10;
+    time2 = 0x0ff0;
+    diff = etimer16_sub_raw(time1, time2, overflow, max_value);
+    expect_diff = 26;
+    ASSERT(diff == expect_diff);
+
+    time1 = 10 + overflow - 1;
+    time2 = 10;
+    diff = etimer16_sub_raw(time1, time2, overflow, max_value);
+    expect_diff = overflow - 1;
+    ASSERT(diff == expect_diff);
+
+    time1 = 10;
+    time2 = 10 + overflow - 1;
+    diff = etimer16_sub_raw(time1, time2, overflow, max_value);
+    expect_diff = -(overflow - 1);
+    ASSERT(diff == expect_diff);
+
+    // Becareful here, uint16_t to int16_t will overflow, should work with _time_past
+    time1 = 10 + overflow + 1;
+    time2 = 10;
+    diff = etimer16_sub_raw(time1, time2, overflow, max_value);
+    expect_diff = -(max_value + 1 - (overflow + 1));
+    ASSERT(diff == expect_diff);
+
+    // Becareful here, uint16_t to int16_t will overflow, should work with _time_past
+    time1 = 10;
+    time2 = 10 + overflow + 1;
+    diff = etimer16_sub_raw(time1, time2, overflow, max_value);
+    expect_diff = (max_value + 1 - (overflow + 1));
+    ASSERT(diff == expect_diff);
+
+    SUITE_END();
+}
+
+void test_etimer16_raw_add(void)
+{
+    SUITE_START("test_etimer16_raw_add");
+
+    uint16_t max_value = 0x0FFF;
+    uint16_t overflow = max_value / 2;
+
+    // check code.
+    uint16_t time1 = 20;
+    int16_t ticks = 10;
+    uint16_t tmp = etimer16_add_raw(time1, ticks, max_value);
+    uint16_t expect_tmp = 30;
+    ASSERT(tmp == expect_tmp);
+
+    time1 = 20;
+    ticks = -10;
+    tmp = etimer16_add_raw(time1, ticks, max_value);
+    expect_tmp = 10;
+    ASSERT(tmp == expect_tmp);
+
+    time1 = 0x0ff0;
+    ticks = 0x20;
+    tmp = etimer16_add_raw(time1, ticks, max_value);
+    expect_tmp = 0x10;
+    ASSERT(tmp == expect_tmp);
+
+    time1 = 0x0ff0;
+    ticks = -0x20;
+    tmp = etimer16_add_raw(time1, ticks, max_value);
+    expect_tmp = 0x0fd0;
+    ASSERT(tmp == expect_tmp);
+
+    time1 = 0x10;
+    ticks = -0x20;
+    tmp = etimer16_add_raw(time1, ticks, max_value);
+    expect_tmp = 0x0ff0;
+    ASSERT(tmp == expect_tmp);
+
+    time1 = 0x0ff0;
+    ticks = 0x0f10;
+    tmp = etimer16_add_raw(time1, ticks, max_value);
+    expect_tmp = 0x0f00;
+    ASSERT(tmp == expect_tmp);
+
+    SUITE_END();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /**
  * @brief  Check two absolute times past: timer1<timer2.
@@ -555,11 +950,19 @@ int main(void)
     test_etimer_past();
     test_etimer_sub();
     test_etimer_add();
+    
+    test_etimer_raw_past();
+    test_etimer_raw_sub();
+    test_etimer_raw_add();
 
     // special sense process test - etimer16
     test_etimer16_past();
     test_etimer16_sub();
     test_etimer16_add();
+
+    test_etimer16_raw_past();
+    test_etimer16_raw_sub();
+    test_etimer16_raw_add();
 
     return 0;
 }
