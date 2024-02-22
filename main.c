@@ -162,6 +162,50 @@ void test_etimer_sub(void)
     SUITE_END();
 }
 
+void test_etimer_add(void)
+{
+    SUITE_START("test_etimer_add");
+
+    // check code.
+    uint32_t time1 = 20;
+    int32_t ticks = 10;
+    uint32_t tmp = etimer_add(time1, ticks);
+    uint32_t expect_tmp = 30;
+    ASSERT(tmp == expect_tmp);
+
+    time1 = 20;
+    ticks = -10;
+    tmp = etimer_add(time1, ticks);
+    expect_tmp = 10;
+    ASSERT(tmp == expect_tmp);
+
+    time1 = 0xfffffff0;
+    ticks = 0x20;
+    tmp = etimer_add(time1, ticks);
+    expect_tmp = 0x10;
+    ASSERT(tmp == expect_tmp);
+
+    time1 = 0xfffffff0;
+    ticks = -0x20;
+    tmp = etimer_add(time1, ticks);
+    expect_tmp = 0xffffffd0;
+    ASSERT(tmp == expect_tmp);
+
+    time1 = 0x10;
+    ticks = -0x20;
+    tmp = etimer_add(time1, ticks);
+    expect_tmp = 0xfffffff0;
+    ASSERT(tmp == expect_tmp);
+
+    time1 = 0xfffffff0;
+    ticks = 0xffffff10;
+    tmp = etimer_add(time1, ticks);
+    expect_tmp = 0xffffff00;
+    ASSERT(tmp == expect_tmp);
+
+    SUITE_END();
+}
+
 void test_etimer16_past(void)
 {
     SUITE_START("test_etimer16_past");
@@ -274,6 +318,50 @@ void test_etimer16_sub(void)
     diff = etimer16_sub(time1, time2);
     expect_diff = (ETIMER16_MAX_VALUE + 1 - (ETIMER16_MAX_VALUE_OVERFLOW + 1));
     ASSERT(diff == expect_diff);
+
+    SUITE_END();
+}
+
+void test_etimer16_add(void)
+{
+    SUITE_START("test_etimer16_add");
+
+    // check code.
+    uint16_t time1 = 20;
+    int16_t ticks = 10;
+    uint16_t tmp = etimer_add(time1, ticks);
+    uint16_t expect_tmp = 30;
+    ASSERT(tmp == expect_tmp);
+
+    time1 = 20;
+    ticks = -10;
+    tmp = etimer_add(time1, ticks);
+    expect_tmp = 10;
+    ASSERT(tmp == expect_tmp);
+
+    time1 = 0xfff0;
+    ticks = 0x20;
+    tmp = etimer_add(time1, ticks);
+    expect_tmp = 0x10;
+    ASSERT(tmp == expect_tmp);
+
+    time1 = 0xfff0;
+    ticks = -0x20;
+    tmp = etimer_add(time1, ticks);
+    expect_tmp = 0xffd0;
+    ASSERT(tmp == expect_tmp);
+
+    time1 = 0x10;
+    ticks = -0x20;
+    tmp = etimer_add(time1, ticks);
+    expect_tmp = 0xfff0;
+    ASSERT(tmp == expect_tmp);
+
+    time1 = 0xfff0;
+    ticks = 0xff10;
+    tmp = etimer_add(time1, ticks);
+    expect_tmp = 0xff00;
+    ASSERT(tmp == expect_tmp);
 
     SUITE_END();
 }
@@ -466,10 +554,12 @@ int main(void)
     // special sense process test - etimer
     test_etimer_past();
     test_etimer_sub();
+    test_etimer_add();
 
     // special sense process test - etimer16
     test_etimer16_past();
     test_etimer16_sub();
+    test_etimer16_add();
 
     return 0;
 }

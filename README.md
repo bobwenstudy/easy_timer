@@ -277,7 +277,7 @@ void test_work_etimer_insuff(void)
 
 ## API说明
 
-主要有以下API。可以看到每个api都提供了一个带`_raw`的接口，用于处理非0xFFFFFFFF的场景。
+主要有以下API。可以看到每个api都提供了一个带`_raw`的接口，用于处理非`0xFFFFFFFF`的场景。
 
 ```c
 static inline int etimer_past_raw(uint32_t time1, uint32_t time2, uint32_t overflow);
@@ -288,6 +288,28 @@ static inline int32_t etimer_sub_raw(uint32_t time1, uint32_t time2, uint32_t ov
                                      uint32_t max_value);
 static inline int32_t etimer_sub(uint32_t time1, uint32_t time2);
 ```
+
+
+
+## API说明16bit
+
+部分场景下，嵌入式只需要16bit的计数器，这时用raw来运算有点浪费性能，所以提供了16bit的操作API，详见`etimer16.h`。
+
+带`_raw`的接口，用于处理非`0xFFFF`的场景。
+
+```c
+static inline int etimer16_past_raw(uint16_t time1, uint16_t time2, uint16_t overflow);
+static inline int etimer16_past(uint16_t time1, uint16_t time2);
+static inline uint16_t etimer16_add_raw(uint16_t time1, int16_t ticks, uint16_t max_value);
+static inline uint16_t etimer16_add(uint16_t time1, int16_t ticks);
+static inline int16_t etimer16_sub_raw(uint16_t time1, uint16_t time2, uint16_t overflow,
+                                       uint16_t max_value);
+static inline int16_t etimer16_sub(uint16_t time1, uint16_t time2);
+```
+
+
+
+
 
 
 
@@ -323,18 +345,22 @@ copy from `output/main.exe' [pei-i386] to `output/main.bin' [binary]
 objdump --source --all-headers --demangle --line-numbers --wide output/main.exe > output/main.lst
 Print Size
    text    data     bss     dec     hex filename
-  44760    2888    2644   50292    c474 output/main.exe
+  49704    2888    2644   55236    d7c4 output/main.exe
 ./output/main.exe
-failed assert [main.c:209] res == 1
+failed assert [main.c:415] res == 1
 Testing test_work .......................................................... fail
-failed assert [main.c:244] res == 1
-failed assert [main.c:250] tmp == 0x10
-failed assert [main.c:258] diff == 0x20
+failed assert [main.c:450] res == 1
+failed assert [main.c:456] tmp == 0x10
+failed assert [main.c:464] diff == 0x20
 Testing test_work_insuff ................................................... fail
 Testing test_work_etimer ................................................... pass
 Testing test_work_etimer_insuff ............................................ pass
 Testing test_etimer_past ................................................... pass
 Testing test_etimer_sub .................................................... pass
+Testing test_etimer_add .................................................... pass
+Testing test_etimer16_past ................................................. pass
+Testing test_etimer16_sub .................................................. pass
+Testing test_etimer16_add .................................................. pass
 Executing 'run: all' complete!
 ```
 
